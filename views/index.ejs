@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Confirmação de Presença - Festa de Aniversário</title>
+
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/css/style.css">
+  </head>
+
+
+
+  <header>
+   <h1 class="middle">
+      <label class="neon"> POOL PARTY RENI </label> 
+   </h1>	
+   <div class="carrossel">
+      <div class="wrapper">
+         <img class="carrossel__imagem" src="/img/reni11.jpg">
+         <img class="carrossel__imagem" src="/img/reni22.jpg">
+         <img class="carrossel__imagem" src="/img/reni3.jpg">
+      </div>
+   </div>
+ </header>
+  <body>
+    <main>
+      <h2>Confirme sua presença:</h2>
+      <% if (typeof confirmed !== 'undefined') { %>
+        <p class="text-success">Presença confirmada!</p>
+      <% } %>
+      <% if (typeof erro !== 'undefined') { %>
+         <p class="text-danger">Algo deu errado. Tente novamente!</p>
+      <% } %>
+      <form method="POST" action="/confirmar">
+         <div class="form-group">
+            <label for="nome">Nome Completo:</label>
+            <input type="text" class="form-control" id="nome" name="nome" required>
+         </div>
+
+         <div class="form-group">
+            <label for="email">Endereço de E-mail:</label>
+            <input type="email" class="form-control" id="email" name="email" required>
+         </div>
+
+         <div class="form-group">
+            <label for="telefone">Telefone:</label>
+            <input type="tel" class="form-control" id="telefone" name="telefone" pattern="[0-9]{11}" required>
+            <small>Formato: 62982520093</small>
+         </div>
+
+         <div class="form-group">
+            <div class="checkbox">
+               <label>
+                  <input type="checkbox" name="carona" value="true"> Preciso de carona
+               </label>
+            </div>
+         </div>
+         <button type="submit" class="btn btn-success">Confirmar Presença</button>
+         
+      </form>
+      <a href="https://chat.whatsapp.com/C1cGgDFlbiyKL2OmUzvzdu"><button class="btn btn-whatsapp">Entrar no Grupo</button></a>
+      <br><br><br>
+
+      <% if (confirmados.length > 0) { %>
+         <h2>Lista de Confirmados:</h2>
+         <ul>
+            <% for (var i=0; i < confirmados.length; i++) { %>
+             <li><%= confirmados[i].nome %> - Precisa de carona: <%= confirmados[i].precisaCarona %></li>
+            <% } %>
+         </ul>
+      <% } %>
+    </main>
+
+    <script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
+    <script src="/js/script.js"></script>
+  </body>
+
+</html>
