@@ -1,11 +1,11 @@
 require('dotenv').config();
 const express = require("express");
 const bodyParser = require("body-parser");
-const { MongoClient } = require('mongodb');
+const { MongoClient, ServerApiVersion } = require('mongodb');
 
-const uri = "mongodb://mongo:2WubHNFSK2LuX6aHSN9t@containers-us-west-203.railway.app:7201";
+const uri = process.env.MONGO_URI;
 
-const client = new MongoClient(uri);
+const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true, serverApi: ServerApiVersion.v1 });
 client.connect(async err => {
   client.close();
 });
