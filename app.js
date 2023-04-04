@@ -1,16 +1,23 @@
+require('dotenv').config();
 const express = require("express");
 const bodyParser = require("body-parser");
+const { MongoClient, ServerApiVersion } = require('mongodb');
 
+const uri = process.env.MONGO_URI;
+
+const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true, serverApi: ServerApiVersion.v1 });
+client.connect(async err => {
+  client.close();
+});
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-app.use(express.static(__dirname + "/publi c"));
+app.use(express.static(__dirname + "/public"));
 app.use(bodyParser.urlencoded({ extended: true }));
 app.set("view engine", "ejs");
 
-let confirmados = [];
-
-app.get("/", (req, res) => {
+app.get("/", async (req, res) => {
+  const confirmados = await client.db("caique").collection("convites").find().toArray();
   res.render("index.ejs", { confirmados: confirmados });
 });
 
@@ -19,15 +26,16 @@ app.get("/public", function (req, res) {
   res.sendFile(__dirname + "/imagem.jpg");
 });
 
-app.post("/confirmar", (req, res) => {
+app.post("/confirmar", async (req, res) => {
   const nome = req.body.nome;
   const email = req.body.email;
   const telefone = req.body.telefone;
   const precisaCarona = req.body.carona;
-
-  if (confirmaPresenca(nome, email, telefone, precisaCarona)) {
+  try {
+    await confirmaPresenca(nome, email, telefone, precisaCarona);
     res.redirect("/?confirmado=true");
-  } else {
+  } catch(e) {
+    console.log(e);
     res.redirect("/?erro=true");
   }
 });
@@ -35,8 +43,7 @@ app.post("/confirmar", (req, res) => {
 app.listen(PORT, () => {
   console.log(`Servidor iniciado na porta ${PORT}.`);
 });
-
-function confirmaPresenca(nome, email, telefone, precisaCarona) {
+async function confirmaPresenca(nome, email, telefone, precisaCarona) {
   // Por enquanto, apenas armazena os dados na variável confirmados... mas podemos tentar enviar por email
   // ou outra coisa que me passe a lista inteira? a lista deve ficar visível a todas as pessoas
   // Preciso ver depois como eu deletaria dados repetidos...
@@ -46,7 +53,8 @@ function confirmaPresenca(nome, email, telefone, precisaCarona) {
     telefone: telefone,
     precisaCarona: precisaCarona ? "Sim" : "Não",
   };
-  confirmados.push(novoConfirmado);
+  await client.db("caique").collection("convites").insertOne(novoConfirmado);
+  const confirmados = await client.db("caique").collection("convites").find().toArray();
   console.log(confirmados);
   return true;
 }
